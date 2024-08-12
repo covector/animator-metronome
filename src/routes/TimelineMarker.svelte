@@ -9,11 +9,18 @@
 	/** @type {number[][]} */
 	let markers = [];
 	let startCycle = 0;
+    const lineLimit = 10;
 	function mark() {
+        if (clearLock) return;
 		if (markers.length === 0) {
 			startCycle = blinkerRowComponent.getCurrentCycle();
 		}
-		const lineNumber = blinkerRowComponent.getCurrentCycle() - startCycle;
+        let lineNumber = blinkerRowComponent.getCurrentCycle() - startCycle;
+        if (markers.length != 0 && lineNumber >= lineLimit) {
+            markers = [];
+            startCycle = blinkerRowComponent.getCurrentCycle();
+            lineNumber = 0;
+        }
 		if (lineNumber >= markers.length) {
 			for (let i = markers.length; i < lineNumber + 1; i++) {
 				markers.push([]);
@@ -25,7 +32,10 @@
 		updateLineYs();
 	}
 	const clearMarkersDelay = 0.5; // seconds
+    let clearLock = false;
 	function clearMarkers() {
+        if (clearLock) return;
+        clearLock = true;
 		// animate lines
 		Array.from(timerlineMarkerComponent.getElementsByClassName('lines')).forEach((l) => {
 			l.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: width }], {
@@ -48,13 +58,14 @@
 		setTimeout(() => {
 			markers = [];
 			updateLineYs();
+            clearLock = false;
 		}, clearMarkersDelay * 1000);
 	}
 	/**
 	 * @param {KeyboardEvent} event
 	 */
 	function keydownHandler(event) {
-		if (event.key == 'm' || event.key == ' ') {
+		if (event.key == 'm' || event.key == ' ' || event.key == 'Enter') {
 			mark();
 		} else if (event.key == 'c' || event.key == 'Escape' || event.key == 'r') {
 			clearMarkers();
@@ -103,7 +114,7 @@
 	function getLineY(lineNumber) {
 		let lsp = (lineSpacing * height) / 100;
 		const vsp = (verticalSpacing * height) / 100;
-		if (markers.length * (strokeWidth + lsp) + 2 * vsp > height) {
+		if (markers.length * (strokeWidth + lsp) - lsp + 2 * vsp > height) {
 			lsp = (height - 2 * vsp - markers.length * strokeWidth) / (markers.length - 1);
 		}
 		return vsp + strokeWidth / 2 + lineNumber * (lsp + strokeWidth);

@@ -29,7 +29,7 @@
 
 <div id="blinkerRow">
 	{#each Array.from({ length: fps }) as _, i}
-		<FrameBlinker primary={i % interval === 0} isBlinking={i === current} />
+		<FrameBlinker primary={i % interval === 0} isBlinking={i === current} index={i} {fps} />
 	{/each}
 </div>
 
