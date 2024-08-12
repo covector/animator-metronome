@@ -18,6 +18,7 @@
 		opacity: 0;
 		transform: translateY(3rem);
 		animation: fadeIn 1s 0.7s forwards;
+		user-select: none;
 	}
 
 	@keyframes fadeIn {

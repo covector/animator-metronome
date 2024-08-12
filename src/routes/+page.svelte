@@ -3,6 +3,7 @@
 	import Title from './Title.svelte';
 	import { page } from '$app/stores';
 	import TimelineMarker from './TimelineMarker.svelte';
+	import MarkerButtons from './MarkerButtons.svelte';
 
 	// get fps and interval from query params
 	const fps = parseNumber($page.url.searchParams.get('fps'), 12, 0, 60);
@@ -23,9 +24,10 @@
 		return isNaN(parsed) ? 0 : Math.max(Math.min(parsed, max), min);
 	}
 
-
 	/** @type {BlinkerRow} */
 	let blinkerRowComponent;
+	/** @type {TimelineMarker} */
+	let timelineMarkerComponent;
 </script>
 
 <svelte:head>
@@ -41,7 +43,8 @@
 <div id="main">
 	<Title {fps} {interval} />
 	<BlinkerRow {fps} {interval} bind:this={blinkerRowComponent} />
-	<TimelineMarker {blinkerRowComponent} />
+	<TimelineMarker {blinkerRowComponent} bind:this={timelineMarkerComponent} />
+	<MarkerButtons {timelineMarkerComponent} />
 </div>
 
 <style>

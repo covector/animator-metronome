@@ -10,7 +10,7 @@
 	let markers = [];
 	let startCycle = 0;
     const lineLimit = 10;
-	function mark() {
+	export function mark() {
         if (animLock) return;
 		updateMeasurements();
 		if (markers.length === 0) {
@@ -34,7 +34,7 @@
 	}
 	const clearMarkersDelay = 0.5; // seconds
     let animLock = true;
-	function clearMarkers() {
+	export function clearMarkers() {
         if (animLock) return;
         animLock = true;
 		// animate lines
@@ -98,11 +98,15 @@
 	}
 	onMount(() => {
 		window.addEventListener('resize', updateMeasurements);
+		window.addEventListener('touchstart', mark);  
 		updateMeasurements();
 		setTimeout(() => {
 			animLock = false;
 		}, 1000);
-		return () => window.removeEventListener('resize', updateMeasurements);
+		return () => {
+			window.removeEventListener('resize', updateMeasurements);
+			window.removeEventListener('touchstart', mark);
+		};
 	});
 
 	// vertical spacing
@@ -178,6 +182,7 @@
 
 	#timelineMarker {
 		width: 100%;
+		max-height: 70vh;
 		flex-grow: 1;
 		overflow: hidden;
 	}
