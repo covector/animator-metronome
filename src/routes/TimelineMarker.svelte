@@ -14,12 +14,14 @@
         if (animLock) return;
 		updateMeasurements();
 		if (markers.length === 0) {
-			startCycle = blinkerRowComponent.getCurrentCycle();
+			startCycle = 0;
+			blinkerRowComponent.resetCycle();
 		}
         let lineNumber = blinkerRowComponent.getCurrentCycle() - startCycle;
         if (markers.length != 0 && lineNumber >= lineLimit) {
             markers = [];
-            startCycle = blinkerRowComponent.getCurrentCycle();
+            startCycle = 0;
+			blinkerRowComponent.resetCycle();
             lineNumber = 0;
         }
 		if (lineNumber >= markers.length) {
@@ -99,14 +101,14 @@
 	}
 	onMount(() => {
 		window.addEventListener('resize', updateMeasurements);
-		// window.addEventListener('touchstart', mark);  
+		window.addEventListener('touchstart', mark);  
 		updateMeasurements();
 		setTimeout(() => {
 			animLock = false;
 		}, 1000);
 		return () => {
 			window.removeEventListener('resize', updateMeasurements);
-			// window.removeEventListener('touchstart', mark);
+			window.removeEventListener('touchstart', mark);
 		};
 	});
 

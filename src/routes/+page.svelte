@@ -11,6 +11,7 @@
 		$page.url.searchParams.get('interval') != null
 			? parseNumber($page.url.searchParams.get('interval'), 3, 0, fps)
 			: parseNumber($page.url.searchParams.get('intv'), 3, 0, fps);
+	const noBlink = $page.url.searchParams.has('noblink');
 	/**
 	 * @param {string|null} value
 	 * @param {number} defaultValue
@@ -42,7 +43,7 @@
 
 <div id="main">
 	<Title {fps} {interval} />
-	<BlinkerRow {fps} {interval} bind:this={blinkerRowComponent} />
+	<BlinkerRow {fps} {interval} {noBlink} bind:this={blinkerRowComponent} />
 	<TimelineMarker {blinkerRowComponent} bind:this={timelineMarkerComponent} />
 	<MarkerButtons {timelineMarkerComponent} />
 </div>

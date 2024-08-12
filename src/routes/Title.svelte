@@ -7,7 +7,7 @@
 
 <style>
 	#title {
-		--font-color: #babac1;
+		--font-color: #c1c1c9;
 	}
 
 	#title {
