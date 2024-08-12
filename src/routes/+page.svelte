@@ -5,21 +5,24 @@
 	import TimelineMarker from './TimelineMarker.svelte';
 
 	// get fps and interval from query params
-	const fps = parseNumber($page.url.searchParams.get('fps'), 12);
+	const fps = parseNumber($page.url.searchParams.get('fps'), 12, 0, 60);
 	const interval =
 		$page.url.searchParams.get('interval') != null
-			? parseNumber($page.url.searchParams.get('interval'), 3)
-			: parseNumber($page.url.searchParams.get('intv'), 3);
+			? parseNumber($page.url.searchParams.get('interval'), 3, 0, fps)
+			: parseNumber($page.url.searchParams.get('intv'), 3, 0, fps);
 	/**
 	 * @param {string|null} value
 	 * @param {number} defaultValue
+	 * @param {number} min
+	 * @param {number} max
 	 * @returns {number}
 	 */
-	function parseNumber(value, defaultValue) {
+	function parseNumber(value, defaultValue, min, max) {
 		if (value === null) return defaultValue;
 		const parsed = parseInt(value);
-		return isNaN(parsed) ? 0 : parsed;
+		return isNaN(parsed) ? 0 : Math.max(Math.min(parsed, max), min);
 	}
+
 
 	/** @type {BlinkerRow} */
 	let blinkerRowComponent;
