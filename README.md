@@ -10,13 +10,21 @@ Clear markers: `c`/`r`/`Escape`
 
 Settings can be configured with URL parameters.
 
-Example:
+Examples:
 ```
 https://covector.github.io/animator-metronome/?fps=24&interval=6
+```
+```
+https://covector.github.io/animator-metronome/?fps=12&interval=1&speed=0.5
+```
+```
+https://covector.github.io/animator-metronome/?fps=4&noblink
 ```
 
 `fps`: Number of steps per second for the metronome. Number of white squares in the website.
 
 `interval`/`intv`: Brighter blink for every `interval` number of squares.
+
+`speed`: Time scaling for speeding up or slowing down the metronome.
 
 `noblink`: Disable blinking.

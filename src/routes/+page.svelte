@@ -6,23 +6,25 @@
 	import MarkerButtons from './MarkerButtons.svelte';
 
 	// get fps and interval from query params
-	const fps = parseNumber($page.url.searchParams.get('fps'), 12, 0, 60);
-	const interval =
-		$page.url.searchParams.get('interval') != null
-			? parseNumber($page.url.searchParams.get('interval'), 3, 0, fps)
-			: parseNumber($page.url.searchParams.get('intv'), 3, 0, fps);
+	const fps = parseNumber(["fps"], 12, 0, 60);
+	const interval = parseNumber(["interval", "intv"], 3, 0, fps)
 	const noBlink = $page.url.searchParams.has('noblink');
+	const speed = parseNumber(["speed", "spd", "timescale", "timeScale"], 1, 0.01, 4, true);
 	/**
-	 * @param {string|null} value
+	 * @param {string[]} aliases
 	 * @param {number} defaultValue
 	 * @param {number} min
 	 * @param {number} max
 	 * @returns {number}
 	 */
-	function parseNumber(value, defaultValue, min, max) {
-		if (value === null) return defaultValue;
-		const parsed = parseInt(value);
-		return isNaN(parsed) ? 0 : Math.max(Math.min(parsed, max), min);
+	function parseNumber(aliases, defaultValue, min, max, float = false) {
+		for (const alias of aliases) {
+			const value = $page.url.searchParams.get(alias);
+			if (value == null) continue;
+			const parsed = float ? parseFloat(value) : parseInt(value);
+			return isNaN(parsed) ? 0 : Math.max(Math.min(parsed, max), min);
+		}
+		return defaultValue;
 	}
 
 	/** @type {BlinkerRow} */
@@ -42,8 +44,8 @@
 </svelte:head>
 
 <div id="main">
-	<Title {fps} {interval} />
-	<BlinkerRow {fps} {interval} {noBlink} bind:this={blinkerRowComponent} />
+	<Title {fps} {interval} {speed} />
+	<BlinkerRow {fps} {interval} {noBlink} {speed} bind:this={blinkerRowComponent} />
 	<TimelineMarker {blinkerRowComponent} bind:this={timelineMarkerComponent} />
 	<MarkerButtons {timelineMarkerComponent} />
 </div>

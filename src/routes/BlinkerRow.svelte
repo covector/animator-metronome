@@ -3,6 +3,7 @@
 	import FrameBlinker from './FrameBlinker.svelte';
 	export let fps = 12;
 	export let interval = 3;
+	export let speed = 1;
 	export let noBlink = false;
 
 	let cycle = 0;
@@ -17,7 +18,7 @@
 		}
 	}
 	onMount(() => {
-		intervalId = setInterval(update, 1000 / fps);
+		intervalId = setInterval(update, 1000 / speed / fps);
 		return () => intervalId > 0 && clearInterval(intervalId);
 	});
 
@@ -32,7 +33,7 @@
 		current = 0;
 		cycle = 0;
 		clearInterval(intervalId);
-		intervalId = setInterval(update, 1000 / fps);
+		intervalId = setInterval(update, 1000 / speed / fps);
 	}
 </script>
 

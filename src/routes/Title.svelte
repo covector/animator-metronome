@@ -1,9 +1,10 @@
 <script>
 	export let fps = 12;
 	export let interval = 3;
+	export let speed = 1;
 </script>
 
-<h1 id="title">{fps} FPS, INTV {interval}</h1>
+<h1 id="title">{fps} FPS, INTV {interval}{speed == 1 ? "" : `, ${speed}x`}</h1>
 
 <style>
 	#title {
