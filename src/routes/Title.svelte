@@ -32,7 +32,8 @@
 		}
 	}
 
-	@media screen and (max-width: 700px) {
+	@media screen and (max-width: 700px), 
+		screen and (max-height: 700px) {
 		#title {
 			font-size: 2rem;
 		}

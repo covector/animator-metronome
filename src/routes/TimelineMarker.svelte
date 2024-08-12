@@ -66,6 +66,7 @@
 	 * @param {KeyboardEvent} event
 	 */
 	function keydownHandler(event) {
+		if (event.repeat) return;
 		if (event.key == 'm' || event.key == ' ' || event.key == 'Enter') {
 			mark();
 		} else if (event.key == 'c' || event.key == 'Escape' || event.key == 'r') {
@@ -98,14 +99,14 @@
 	}
 	onMount(() => {
 		window.addEventListener('resize', updateMeasurements);
-		window.addEventListener('touchstart', mark);  
+		// window.addEventListener('touchstart', mark);  
 		updateMeasurements();
 		setTimeout(() => {
 			animLock = false;
 		}, 1000);
 		return () => {
 			window.removeEventListener('resize', updateMeasurements);
-			window.removeEventListener('touchstart', mark);
+			// window.removeEventListener('touchstart', mark);
 		};
 	});
 

@@ -8,7 +8,7 @@
 </script>
 
 <div id="markerButtons">
-    <button on:click={timelineMarkerComponent.mark} class="markButton" on:touchstart|stopPropagation>
+    <button on:mousedown={timelineMarkerComponent.mark} class="markButton" on:touchstart|stopPropagation>
         <svg width={buttonWidth} height={buttonWidth} viewBox={`0 0 ${buttonWidth} ${buttonWidth}`} xmlns="http://www.w3.org/2000/svg">
             <rect x={(buttonWidth-iconWidth)/2} y={(buttonWidth-iconWidth)/2}
                 width={iconWidth} height={iconWidth}
@@ -17,7 +17,7 @@
             />
         </svg>
     </button>
-    <button on:click={timelineMarkerComponent.clearMarkers} class="clearButton" on:touchstart|stopPropagation>
+    <button on:mousedown={timelineMarkerComponent.clearMarkers} class="clearButton" on:touchstart|stopPropagation>
         <svg width={buttonWidth} height={buttonWidth} viewBox={`0 0 ${buttonWidth} ${buttonWidth}`} xmlns="http://www.w3.org/2000/svg">
             <rect x={(buttonWidth-iconWidth)/2} y={(buttonWidth-iconWidth)/2}
                 width={iconWidth} height={iconWidth}
