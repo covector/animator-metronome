@@ -11,7 +11,8 @@
 	let startCycle = 0;
     const lineLimit = 10;
 	function mark() {
-        if (clearLock) return;
+        if (animLock) return;
+		updateMeasurements();
 		if (markers.length === 0) {
 			startCycle = blinkerRowComponent.getCurrentCycle();
 		}
@@ -32,10 +33,10 @@
 		updateLineYs();
 	}
 	const clearMarkersDelay = 0.5; // seconds
-    let clearLock = false;
+    let animLock = true;
 	function clearMarkers() {
-        if (clearLock) return;
-        clearLock = true;
+        if (animLock) return;
+        animLock = true;
 		// animate lines
 		Array.from(timerlineMarkerComponent.getElementsByClassName('lines')).forEach((l) => {
 			l.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: width }], {
@@ -58,7 +59,7 @@
 		setTimeout(() => {
 			markers = [];
 			updateLineYs();
-            clearLock = false;
+            animLock = false;
 		}, clearMarkersDelay * 1000);
 	}
 	/**
@@ -96,8 +97,11 @@
 		updateSVGs();
 	}
 	onMount(() => {
-		updateMeasurements();
 		window.addEventListener('resize', updateMeasurements);
+		updateMeasurements();
+		setTimeout(() => {
+			animLock = false;
+		}, 1000);
 		return () => window.removeEventListener('resize', updateMeasurements);
 	});
 
