@@ -10,6 +10,9 @@
   let markers = [];
   let startCycle = 0;
   const lineLimit = 10;
+  let clearAnimLock = false;
+  /** @type {number[][]} */
+  let tempMarkers = [];
   export function mark() {
     if (animLock) return;
     updateMeasurements();
@@ -19,18 +22,48 @@
     }
     let lineNumber = blinkerRowComponent.getCurrentCycle() - startCycle;
     if (markers.length != 0 && lineNumber >= lineLimit) {
-      markers = [];
       startCycle = 0;
       blinkerRowComponent.resetCycle();
       lineNumber = 0;
+      clearAnimLock = true;
+      animateOut(true);
     }
-    if (lineNumber >= markers.length) {
-      for (let i = markers.length; i < lineNumber + 1; i++) {
-        markers.push([]);
+    if (clearAnimLock) {
+      if (lineNumber >= tempMarkers.length) {
+        for (let i = tempMarkers.length; i < lineNumber + 1; i++) {
+          tempMarkers.push([]);
+          const line = timerlineMarkerComponent.getElementsByClassName("lines l_" + i)[0];
+          line?.getAnimations().forEach((a) => a.cancel());
+          line?.animate([{ strokeDashoffset: width }, { strokeDashoffset: 0 }], {
+            duration: 1000,
+            easing: "cubic-bezier(.08,.76,.33,.94)",
+            fill: "forwards"
+          });
+        }
       }
+      if (tempMarkers[lineNumber].includes(blinkerRowComponent.getCurrent())) return;
+      tempMarkers[lineNumber].push(blinkerRowComponent.getCurrent());
+      const marker = timerlineMarkerComponent.getElementsByClassName(
+        `markers l_${lineNumber} m_${blinkerRowComponent.getCurrent()}`
+      )[0];
+      marker?.getAnimations().forEach((a) => a.cancel());
+      marker?.animate(
+        [{ transform: "scale(0) rotate(-45deg)" }, { transform: "scale(1) rotate(45deg)" }],
+        {
+          duration: 500,
+          easing: "cubic-bezier(.08,.76,.33,.94)",
+          fill: "forwards"
+        }
+      );
+    } else {
+      if (lineNumber >= markers.length) {
+        for (let i = markers.length; i < lineNumber + 1; i++) {
+          markers.push([]);
+        }
+      }
+      if (markers[lineNumber].includes(blinkerRowComponent.getCurrent())) return;
+      markers[lineNumber].push(blinkerRowComponent.getCurrent());
     }
-    if (markers[lineNumber].includes(blinkerRowComponent.getCurrent())) return;
-    markers[lineNumber].push(blinkerRowComponent.getCurrent());
     markers = markers;
     updateLineYs();
   }
@@ -38,9 +71,13 @@
   let animLock = true;
   export function clearMarkers() {
     if (animLock) return;
+    if (markers.length === 0) return;
     animLock = true;
+    animateOut();
+  }
+  function animateOut(hack = false) {
     // animate lines
-    Array.from(timerlineMarkerComponent.getElementsByClassName("lines")).forEach((l) => {
+    Array.from(timerlineMarkerComponent.getElementsByClassName("lines")).forEach((l, i) => {
       l.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: width }], {
         duration: clearMarkersDelay * 1000,
         easing: "cubic-bezier(.59,.34,.33,.94)",
@@ -48,7 +85,7 @@
       });
     });
     // animate markers
-    Array.from(timerlineMarkerComponent.getElementsByClassName("markers")).forEach((m) => {
+    Array.from(timerlineMarkerComponent.getElementsByClassName("markers")).forEach((m, i) => {
       m.animate(
         [{ transform: "scale(1) rotate(45deg)" }, { transform: "scale(0) rotate(-45deg)" }],
         {
@@ -59,9 +96,15 @@
       );
     });
     setTimeout(() => {
-      markers = [];
+      if (hack) {
+        markers = tempMarkers;
+        tempMarkers = [];
+        clearAnimLock = false;
+      } else {
+        markers = [];
+        animLock = false;
+      }
       updateLineYs();
-      animLock = false;
     }, clearMarkersDelay * 1000);
   }
   /**
@@ -162,9 +205,9 @@
 <div id="timelineMarker" bind:this={timerlineMarkerComponent}>
   <svg class="timeline" viewBox={`0 0 ${width} ${height}`} xmlns="http://www.w3.org/2000/svg">
     {#if blinkerXs.length > 0}
-      {#each markers as mks, i}
+      {#each clearAnimLock ? tempMarkers : markers as mks, i}
         <line
-          class="lines"
+          class={`lines l_${i}`}
           x1={blinkerXs[0] - blinkerWidth * 0.2}
           y1="0"
           x2={blinkerXs[blinkerXs.length - 1] + blinkerWidth * 0.2}
@@ -178,7 +221,7 @@
             style={`transform: translate(${blinkerXs[mk] - markerWidth / 2}px, ${lineYs[i] - markerWidth / 2}px)`}
           >
             <rect
-              class="markers"
+              class={`markers l_${i} m_${mk}`}
               width={markerWidth}
               height={markerWidth}
               rx={markerWidth * 0.3}
