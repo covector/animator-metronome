@@ -1,70 +1,70 @@
 <script>
-	import BlinkerRow from './BlinkerRow.svelte';
-	import Title from './Title.svelte';
-	import { page } from '$app/stores';
-	import TimelineMarker from './TimelineMarker.svelte';
-	import MarkerButtons from './MarkerButtons.svelte';
+  import BlinkerRow from "./BlinkerRow.svelte";
+  import Title from "./Title.svelte";
+  import { page } from "$app/stores";
+  import TimelineMarker from "./TimelineMarker.svelte";
+  import MarkerButtons from "./MarkerButtons.svelte";
 
-	// get fps and interval from query params
-	const fps = parseNumber(["fps"], 12, 0, 60);
-	const interval = parseNumber(["interval", "intv"], 3, 0, fps)
-	const noBlink = $page.url.searchParams.has('noblink');
-	const speed = parseNumber(["speed", "spd", "timescale", "timeScale"], 1, 0.01, 4, true);
-	/**
-	 * @param {string[]} aliases
-	 * @param {number} defaultValue
-	 * @param {number} min
-	 * @param {number} max
-	 * @returns {number}
-	 */
-	function parseNumber(aliases, defaultValue, min, max, float = false) {
-		for (const alias of aliases) {
-			const value = $page.url.searchParams.get(alias);
-			if (value == null) continue;
-			const parsed = float ? parseFloat(value) : parseInt(value);
-			return isNaN(parsed) ? 0 : Math.max(Math.min(parsed, max), min);
-		}
-		return defaultValue;
-	}
+  // get fps and interval from query params
+  const fps = parseNumber(["fps"], 12, 0, 60);
+  const interval = parseNumber(["interval", "intv"], 3, 0, fps);
+  const noBlink = $page.url.searchParams.has("noblink");
+  const speed = parseNumber(["speed", "spd", "timescale", "timeScale"], 1, 0.01, 4, true);
+  /**
+   * @param {string[]} aliases
+   * @param {number} defaultValue
+   * @param {number} min
+   * @param {number} max
+   * @returns {number}
+   */
+  function parseNumber(aliases, defaultValue, min, max, float = false) {
+    for (const alias of aliases) {
+      const value = $page.url.searchParams.get(alias);
+      if (value == null) continue;
+      const parsed = float ? parseFloat(value) : parseInt(value);
+      return isNaN(parsed) ? 0 : Math.max(Math.min(parsed, max), min);
+    }
+    return defaultValue;
+  }
 
-	/** @type {BlinkerRow} */
-	let blinkerRowComponent;
-	/** @type {TimelineMarker} */
-	let timelineMarkerComponent;
+  /** @type {BlinkerRow} */
+  let blinkerRowComponent;
+  /** @type {TimelineMarker} */
+  let timelineMarkerComponent;
 </script>
 
 <svelte:head>
-	<title>Animator Metronome</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" />
-	<link
-		href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,700&display=swap"
-		rel="stylesheet"
-	/>
+  <title>Animator Metronome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,700&display=swap"
+    rel="stylesheet"
+  />
 </svelte:head>
 
 <div id="main">
-	<Title {fps} {interval} {speed} />
-	<BlinkerRow {fps} {interval} {noBlink} {speed} bind:this={blinkerRowComponent} />
-	<TimelineMarker {blinkerRowComponent} bind:this={timelineMarkerComponent} />
-	<MarkerButtons {timelineMarkerComponent} />
+  <Title {fps} {interval} {speed} />
+  <BlinkerRow {fps} {interval} {noBlink} {speed} bind:this={blinkerRowComponent} />
+  <TimelineMarker {blinkerRowComponent} bind:this={timelineMarkerComponent} />
+  <MarkerButtons {timelineMarkerComponent} />
 </div>
 
 <style>
-	* {
-		--background-color: #d9dae1;
-	}
+  * {
+    --background-color: #d9dae1;
+  }
 
-	#main {
-		background-color: var(--background-color);
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		justify-content: start;
-		align-items: center;
-		height: 100vh;
-		width: 100%;
-		gap: 2.5vw;
-		padding-top: 1vh;
-	}
+  #main {
+    background-color: var(--background-color);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    gap: 2.5vw;
+    padding-top: 1vh;
+  }
 </style>

@@ -11,12 +11,15 @@ Clear markers: `c`/`r`/`Escape`
 Settings can be configured with URL parameters.
 
 Examples:
+
 ```
 https://covector.github.io/animator-metronome/?fps=24&interval=6
 ```
+
 ```
 https://covector.github.io/animator-metronome/?fps=12&interval=1&speed=0.5
 ```
+
 ```
 https://covector.github.io/animator-metronome/?fps=4&noblink
 ```
