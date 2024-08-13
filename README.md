@@ -30,4 +30,10 @@ https://covector.github.io/animator-metronome/?fps=4&noblink
 
 `speed`: Time scaling for speeding up or slowing down the metronome.
 
-`noblink`: Disable blinking.
+`no-blink`: Disable blinking.
+
+`max-lines`: Maximum lines of markers before it clears itself automatically.
+
+`show-all-delta`: Shows frame difference between frames even for a small delta.
+
+`hide-delta`: Do not display delta information.

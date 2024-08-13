@@ -2,16 +2,31 @@
   import { onMount } from "svelte";
   import BlinkerRow from "./BlinkerRow.svelte";
 
+  export let fps = 12;
+  export let lineLimit = 10;
   /** @type {BlinkerRow} */
   export let blinkerRowComponent;
+  export let showAllDelta = false;
+  export let hideDelta = false;
 
   // marking
-  /** @type {number[][]} */
+  /** @type {{frame: number, delta: number}[][]} */
   let markers = [];
+  /**
+   * @param {{frame: number, delta: number}[][]} mks
+   * @param {number} line
+   * @param {number} frame
+   * @returns {number}
+   */
+  function getLastDelta(mks, line, frame) {
+    for (let i = line; i >= 0; i--) {
+      if (mks[i].length > 0) return line * fps + frame - i * fps - mks[i][mks[i].length - 1].frame;
+    }
+    return -1;
+  }
   let startCycle = 0;
-  const lineLimit = 10;
   let clearAnimLock = false;
-  /** @type {number[][]} */
+  /** @type {{frame: number, delta: number}[][]} */
   let tempMarkers = [];
   export function mark() {
     if (animLock) return;
@@ -41,34 +56,45 @@
           });
         }
       }
-      if (tempMarkers[lineNumber].includes(blinkerRowComponent.getCurrent())) return;
-      tempMarkers[lineNumber].push(blinkerRowComponent.getCurrent());
-      if (!markers[lineNumber].includes(blinkerRowComponent.getCurrent())) {
-        markers[lineNumber].push(blinkerRowComponent.getCurrent());
-      } else {
-        const marker = timerlineMarkerComponent.getElementsByClassName(
-          `markers l_${lineNumber} m_${blinkerRowComponent.getCurrent()}`
-        )[0];
-        marker?.getAnimations().forEach((a) => a.cancel());
-        marker?.animate(
-          [{ transform: "scale(0) rotate(-45deg)" }, { transform: "scale(1) rotate(45deg)" }],
-          {
-            duration: 500,
-            easing: "cubic-bezier(.08,.76,.33,.94)",
-            fill: "forwards"
-          }
-        );
-      }
+      if (
+        tempMarkers[lineNumber].findIndex((m) => m.frame == blinkerRowComponent.getCurrent()) != -1
+      )
+        return;
+      tempMarkers[lineNumber].push({
+        frame: blinkerRowComponent.getCurrent(),
+        delta: getLastDelta(tempMarkers, lineNumber, blinkerRowComponent.getCurrent())
+      });
+      // if (markers[lineNumber].findIndex(m => m.frame == blinkerRowComponent.getCurrent()) == -1) {
+      //   markers[lineNumber].push({...tempMarkers[lineNumber][tempMarkers[lineNumber].length - 1]});
+      // } else {
+      //   const marker = timerlineMarkerComponent.getElementsByClassName(
+      //     `markers l_${lineNumber} m_${blinkerRowComponent.getCurrent()}`
+      //   )[0];
+      //   marker?.getAnimations().forEach((a) => a.finish());
+      //   marker?.animate(
+      //     [{ transform: "scale(0) rotate(-45deg)" }, { transform: "scale(1) rotate(45deg)" }],
+      //     {
+      //       duration: 500,
+      //       easing: "cubic-bezier(.08,.76,.33,.94)",
+      //       fill: "forwards"
+      //     }
+      //   );
+      // }
+      // markers = markers;
     } else {
       if (lineNumber >= markers.length) {
         for (let i = markers.length; i < lineNumber + 1; i++) {
           markers.push([]);
         }
       }
-      if (markers[lineNumber].includes(blinkerRowComponent.getCurrent())) return;
-      markers[lineNumber].push(blinkerRowComponent.getCurrent());
+      if (markers[lineNumber].findIndex((m) => m.frame == blinkerRowComponent.getCurrent()) != -1)
+        return;
+      markers[lineNumber].push({
+        frame: blinkerRowComponent.getCurrent(),
+        delta: getLastDelta(markers, lineNumber, blinkerRowComponent.getCurrent())
+      });
+      markers = markers;
     }
-    markers = markers;
     updateLineYs();
   }
   const clearMarkersDelay = 0.5; // seconds
@@ -89,9 +115,20 @@
       });
     });
     // animate markers
-    Array.from(timerlineMarkerComponent.getElementsByClassName("markers")).forEach((m, i) => {
-      m.animate(
+    Array.from(timerlineMarkerComponent.getElementsByClassName("markerWrapper")).forEach((m, i) => {
+      m.getElementsByClassName("markers")[0]?.animate(
         [{ transform: "scale(1) rotate(45deg)" }, { transform: "scale(0) rotate(-45deg)" }],
+        {
+          duration: clearMarkersDelay * 1000,
+          easing: "cubic-bezier(.59,.34,.33,.94)",
+          fill: "forwards"
+        }
+      );
+      m.getElementsByClassName("delta")[0]?.animate(
+        [
+          { opacity: 1, transform: "translate(0, 0)" },
+          { opacity: 0, transform: "translate(0, 5px)" }
+        ],
         {
           duration: clearMarkersDelay * 1000,
           easing: "cubic-bezier(.59,.34,.33,.94)",
@@ -217,19 +254,36 @@
           stroke-width={strokeWidth}
           style={`transform: translateY(${lineYs[i]}px); stroke-dasharray: ${width}px; stroke-dashoffset: ${width}px;`}
         />
-        {#each mks as mk (mk)}
+        {#each mks as mk, j (mk)}
           <g
             class="markerWrapper"
-            style={`transform: translate(${blinkerXs[mk] - markerWidth / 2}px, ${lineYs[i] - markerWidth / 2}px)`}
+            style={`transform: translate(${blinkerXs[mk.frame] - markerWidth / 2}px, ${lineYs[i] - markerWidth / 2}px)`}
           >
             <rect
-              class={`markers l_${i} m_${mk}`}
+              class={`markers l_${i} m_${mk.frame}`}
               width={markerWidth}
               height={markerWidth}
               rx={markerWidth * 0.3}
               ry={markerWidth * 0.3}
               stroke-width={markerStrokeWidth}
             />
+            {#if !hideDelta && ((showAllDelta && mk.delta != -1) || mk.delta > fps / 2 || (mk.delta != -1 && j == 0))}
+              <text
+                class="delta"
+                x={mk.frame == 0
+                  ? blinkerXs[blinkerXs.length - 1] -
+                    blinkerXs[mk.frame] +
+                    blinkerWidth * 0.2 +
+                    markerWidth * 0.6
+                  : -markerWidth * 0.08}
+                y={markerWidth * 0.15 + (mk.frame == 0 ? lineYs[i - 1] - lineYs[i] : 0)}
+                dominant-baseline="middle"
+                text-anchor="end"
+                font-size={markerWidth * 0.5}
+              >
+                {mk.delta}
+              </text>
+            {/if}
           </g>
         {/each}
       {/each}
@@ -288,6 +342,24 @@
     }
     to {
       transform: scale(1) rotate(45deg);
+    }
+  }
+
+  .markerWrapper text {
+    font-family: "Roboto", sans-serif;
+    fill: var(--marker-color);
+    font-weight: 700;
+    animation: textAnimation 0.5s cubic-bezier(0.08, 0.76, 0.33, 0.94) forwards;
+    user-select: none;
+  }
+  @keyframes textAnimation {
+    from {
+      opacity: 0;
+      transform: translate(0, 20px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(0, 0);
     }
   }
 </style>

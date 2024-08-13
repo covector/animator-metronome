@@ -8,8 +8,13 @@
   // get fps and interval from query params
   const fps = parseNumber(["fps"], 12, 0, 60);
   const interval = parseNumber(["interval", "intv"], 3, 0, fps);
-  const noBlink = $page.url.searchParams.has("noblink");
-  const speed = parseNumber(["speed", "spd", "timescale", "timeScale"], 1, 0.01, 4, true);
+  const noBlink = $page.url.searchParams.has("noblink") || $page.url.searchParams.has("no-blink");
+  const speed = parseNumber(["speed", "spd"], 1, 0.01, 4, true);
+  const maxLines = parseNumber(["maxlines", "max-lines", "maxline", "max-line"], 10, 1, 30);
+  const showAllDelta =
+    $page.url.searchParams.has("showalldelta") || $page.url.searchParams.has("show-all-delta");
+  const hideDelta =
+    $page.url.searchParams.has("hidedelta") || $page.url.searchParams.has("hide-delta");
   /**
    * @param {string[]} aliases
    * @param {number} defaultValue
@@ -46,7 +51,14 @@
 <div id="main">
   <Title {fps} {interval} {speed} />
   <BlinkerRow {fps} {interval} {noBlink} {speed} bind:this={blinkerRowComponent} />
-  <TimelineMarker {blinkerRowComponent} bind:this={timelineMarkerComponent} />
+  <TimelineMarker
+    {fps}
+    lineLimit={maxLines}
+    {blinkerRowComponent}
+    {showAllDelta}
+    {hideDelta}
+    bind:this={timelineMarkerComponent}
+  />
   <MarkerButtons {timelineMarkerComponent} />
 </div>
 
