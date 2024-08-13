@@ -37,3 +37,5 @@ https://covector.github.io/animator-metronome/?fps=4&noblink
 `show-all-delta`: Shows frame difference between frames even for a small delta.
 
 `hide-delta`: Do not display delta information.
+
+`no-grid`: Disable unit markings on the timeline.

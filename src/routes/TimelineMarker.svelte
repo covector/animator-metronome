@@ -8,6 +8,7 @@
   export let blinkerRowComponent;
   export let showAllDelta = false;
   export let hideDelta = false;
+  export let noGrid = false;
 
   // marking
   /** @type {{frame: number, delta: number}[][]} */
@@ -254,6 +255,13 @@
           stroke-width={strokeWidth}
           style={`transform: translateY(${lineYs[i]}px); stroke-dasharray: ${width}px; stroke-dashoffset: ${width}px;`}
         />
+      {/each}
+      {#if !noGrid}
+        {#each blinkerXs as b, i (i)}
+          <line class="lineUnit" x1={b} y1="0" x2={b} y2={height} stroke-width={strokeWidth} />
+        {/each}
+      {/if}
+      {#each markers as mks, i (i)}
         {#each mks as mk, j (mk)}
           <g
             class="markerWrapper"
@@ -318,6 +326,10 @@
     to {
       stroke-dashoffset: 0;
     }
+  }
+
+  .lineUnit {
+    stroke: var(--background-color);
   }
 
   .markerWrapper {

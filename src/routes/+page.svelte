@@ -15,6 +15,7 @@
     $page.url.searchParams.has("showalldelta") || $page.url.searchParams.has("show-all-delta");
   const hideDelta =
     $page.url.searchParams.has("hidedelta") || $page.url.searchParams.has("hide-delta");
+  const noGrid = $page.url.searchParams.has("nogrid") || $page.url.searchParams.has("no-grid");
   /**
    * @param {string[]} aliases
    * @param {number} defaultValue
@@ -57,6 +58,7 @@
     {blinkerRowComponent}
     {showAllDelta}
     {hideDelta}
+    {noGrid}
     bind:this={timelineMarkerComponent}
   />
   <MarkerButtons {timelineMarkerComponent} />
