@@ -43,18 +43,22 @@
       }
       if (tempMarkers[lineNumber].includes(blinkerRowComponent.getCurrent())) return;
       tempMarkers[lineNumber].push(blinkerRowComponent.getCurrent());
-      const marker = timerlineMarkerComponent.getElementsByClassName(
-        `markers l_${lineNumber} m_${blinkerRowComponent.getCurrent()}`
-      )[0];
-      marker?.getAnimations().forEach((a) => a.cancel());
-      marker?.animate(
-        [{ transform: "scale(0) rotate(-45deg)" }, { transform: "scale(1) rotate(45deg)" }],
-        {
-          duration: 500,
-          easing: "cubic-bezier(.08,.76,.33,.94)",
-          fill: "forwards"
-        }
-      );
+      if (!markers[lineNumber].includes(blinkerRowComponent.getCurrent())) {
+        markers[lineNumber].push(blinkerRowComponent.getCurrent());
+      } else {
+        const marker = timerlineMarkerComponent.getElementsByClassName(
+          `markers l_${lineNumber} m_${blinkerRowComponent.getCurrent()}`
+        )[0];
+        marker?.getAnimations().forEach((a) => a.cancel());
+        marker?.animate(
+          [{ transform: "scale(0) rotate(-45deg)" }, { transform: "scale(1) rotate(45deg)" }],
+          {
+            duration: 500,
+            easing: "cubic-bezier(.08,.76,.33,.94)",
+            fill: "forwards"
+          }
+        );
+      }
     } else {
       if (lineNumber >= markers.length) {
         for (let i = markers.length; i < lineNumber + 1; i++) {
@@ -177,11 +181,9 @@
     if (width > 700) {
       verticalSpacing = 20;
       lineSpacing = 10;
-      strokeWidth = 5;
     } else {
       verticalSpacing = 15;
       lineSpacing = 8;
-      strokeWidth = 3;
     }
     lineYs = Array.from({ length: markers.length }, (_, i) => getLineY(i));
   }
@@ -205,7 +207,7 @@
 <div id="timelineMarker" bind:this={timerlineMarkerComponent}>
   <svg class="timeline" viewBox={`0 0 ${width} ${height}`} xmlns="http://www.w3.org/2000/svg">
     {#if blinkerXs.length > 0}
-      {#each clearAnimLock ? tempMarkers : markers as mks, i}
+      {#each markers as mks, i (i)}
         <line
           class={`lines l_${i}`}
           x1={blinkerXs[0] - blinkerWidth * 0.2}
@@ -215,7 +217,7 @@
           stroke-width={strokeWidth}
           style={`transform: translateY(${lineYs[i]}px); stroke-dasharray: ${width}px; stroke-dashoffset: ${width}px;`}
         />
-        {#each mks as mk}
+        {#each mks as mk (mk)}
           <g
             class="markerWrapper"
             style={`transform: translate(${blinkerXs[mk] - markerWidth / 2}px, ${lineYs[i] - markerWidth / 2}px)`}
