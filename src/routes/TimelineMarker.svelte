@@ -184,15 +184,33 @@
     updateSVGs();
     updateLineYs();
   }
+  function orientationChanged() {
+    const timeout = 120;
+    return new window.Promise(function (resolve) {
+      // @ts-ignore
+      const go = (i, height0) => {
+        timerlineMarkerComponent.clientHeight == height0 || i >= timeout
+          ? // @ts-ignore
+            resolve()
+          : window.requestAnimationFrame(() => go(i + 1, timerlineMarkerComponent.clientHeight));
+      };
+      go(0, 0);
+    });
+  }
+  function handleSizeChange() {
+    orientationChanged().then(() => {
+      updateMeasurements();
+    });
+  }
   onMount(() => {
-    window.addEventListener("resize", updateMeasurements);
+    window.addEventListener("resize", handleSizeChange);
     window.addEventListener("touchstart", mark, { passive: true });
     updateMeasurements();
     setTimeout(() => {
       animLock = false;
     }, 1000);
     return () => {
-      window.removeEventListener("resize", updateMeasurements);
+      window.removeEventListener("resize", handleSizeChange);
       window.removeEventListener("touchstart", mark);
     };
   });
