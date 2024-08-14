@@ -40,11 +40,12 @@
 </script>
 
 <svelte:head>
+  <meta name="description" content="A timing tool for animators." />
   <title>Animator Metronome</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@0,700&display=swap"
     rel="stylesheet"
   />
 </svelte:head>

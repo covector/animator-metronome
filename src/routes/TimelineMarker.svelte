@@ -186,7 +186,7 @@
   }
   onMount(() => {
     window.addEventListener("resize", updateMeasurements);
-    window.addEventListener("touchstart", mark);
+    window.addEventListener("touchstart", mark, { passive: true });
     updateMeasurements();
     setTimeout(() => {
       animLock = false;

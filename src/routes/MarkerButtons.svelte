@@ -9,6 +9,7 @@
 
 <div id="markerButtons">
   <button
+    aria-label="Add marker"
     on:mousedown={timelineMarkerComponent.mark}
     class="markButton"
     on:touchstart|stopPropagation
@@ -31,6 +32,7 @@
     </svg>
   </button>
   <button
+    aria-label="Clear markers"
     on:mousedown={timelineMarkerComponent.clearMarkers}
     class="clearButton"
     on:touchstart|stopPropagation
