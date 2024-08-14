@@ -181,8 +181,8 @@
     );
     blinkerWidth =
       document.getElementsByClassName("frameBlinker")[0]?.getBoundingClientRect().width || 0;
-    updateLineYs();
     updateSVGs();
+    updateLineYs();
   }
   onMount(() => {
     window.addEventListener("resize", updateMeasurements);

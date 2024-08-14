@@ -1,13 +1,21 @@
 <script>
+  import { onMount } from "svelte";
   import TimelineMarker from "./TimelineMarker.svelte";
   /** @type {TimelineMarker} */
   export let timelineMarkerComponent;
 
   const buttonWidth = 60;
   const iconWidth = 25;
+
+  onMount(() => {
+    if ("ontouchstart" in window || navigator?.maxTouchPoints > 0) {
+      isTouch = true;
+    }
+  });
+  let isTouch = false;
 </script>
 
-<div id="markerButtons">
+<div id="markerButtons" class={isTouch ? "isTouch" : ""}>
   <button
     aria-label="Add marker"
     on:mousedown={timelineMarkerComponent.mark}
@@ -92,6 +100,7 @@
     line-height: 0;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.06);
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
     transition:
       background-color 0.2s,
       filter 0.2s;
@@ -122,18 +131,29 @@
     cursor: pointer;
   }
 
-  #markerButtons button:active {
+  #markerButtons:not(.isTouch) button:active {
     filter: brightness(0.9);
   }
 
-  #markerButtons button.markButton:hover {
+  #markerButtons:not(.isTouch) button.markButton:hover {
     background-color: var(--mark-button-hover-color);
   }
 
-  #markerButtons button.clearButton:hover {
+  #markerButtons:not(.isTouch) button.clearButton:hover {
     background-color: var(--clear-button-hover-color);
   }
-  #markerButtons .clearButton:hover svg rect.cross {
+  #markerButtons:not(.isTouch) .clearButton:hover svg rect.cross {
+    stroke: var(--clear-button-hover-color);
+  }
+
+  #markerButtons.isTouch button.markButton:active {
+    background-color: var(--mark-button-hover-color);
+  }
+
+  #markerButtons.isTouch button.clearButton:active {
+    background-color: var(--clear-button-hover-color);
+  }
+  #markerButtons.isTouch .clearButton:active svg rect.cross {
     stroke: var(--clear-button-hover-color);
   }
 </style>
