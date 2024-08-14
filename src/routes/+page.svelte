@@ -4,6 +4,7 @@
   import { page } from "$app/stores";
   import TimelineMarker from "./TimelineMarker.svelte";
   import MarkerButtons from "./MarkerButtons.svelte";
+  import { onMount } from "svelte";
 
   // get fps and interval from query params
   const fps = parseNumber(["fps"], 12, 0, 60);
@@ -37,6 +38,17 @@
   let blinkerRowComponent;
   /** @type {TimelineMarker} */
   let timelineMarkerComponent;
+
+  // get correct vh
+  let vh = 0;
+  function updateVh() {
+    vh = window.innerHeight;
+  }
+  onMount(() => {
+    updateVh();
+    window.addEventListener("resize", updateVh);
+    return () => window.removeEventListener("resize", updateVh);
+  });
 </script>
 
 <svelte:head>
@@ -50,7 +62,7 @@
   />
 </svelte:head>
 
-<div id="main">
+<div id="main" style={`height: ${vh}px`}>
   <Title {fps} {interval} {speed} />
   <BlinkerRow {fps} {interval} {noBlink} {speed} bind:this={blinkerRowComponent} />
   <TimelineMarker
@@ -77,7 +89,6 @@
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    height: 100vh;
     width: 100%;
     gap: 2.5vw;
     padding-top: 1vh;
